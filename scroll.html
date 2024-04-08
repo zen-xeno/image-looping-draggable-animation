@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infinite Scrolling Box</title>
+<style>
+  #logo-animation{
+    padding: 3rem;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .container {
+    width: 100%;
+    overflow-x: hidden;
+    white-space: nowrap;
+    cursor: grab;
+  }
+  .image {
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    margin-right: 10px;
+    background-size: cover;
+    background-position: center;
+  }
+</style>
+</head>
+<body>
+<section id="logo-animation">
+    <h3>Partnered Publishing</h3>
+    <div class="wrapper-logo-animation">
+        <div class="container" id="container">
+            <div class="image" style="background-image: url('img/port1.JPG');"></div>
+            <div class="image" style="background-image: url('img/port2.JPG');"></div>
+            <div class="image" style="background-image: url('img/port3.JPG');"></div>
+            <div class="image" style="background-image: url('img/port4.JPG');"></div>
+            <div class="image" style="background-image: url('img/port1.JPG');"></div>
+            <div class="image" style="background-image: url('img/port2.JPG');"></div>
+            <div class="image" style="background-image: url('img/port3.JPG');"></div>
+            <div class="image" style="background-image: url('img/port4.JPG');"></div>
+            <!-- Add more images as needed -->
+          </div>
+    </div>
+</section>
+
+
+
+<script>
+  const container = document.getElementById('container');
+  const images = document.querySelectorAll('.image');
+  let isMouseDown = false;
+  let startX;
+  let scrollLeft;
+  const imageWidth = images[0].offsetWidth + 10; // considering margin-right: 10px
+
+  container.addEventListener('mousedown', (e) => {
+    isMouseDown = true;
+    startX = e.pageX - container.offsetLeft;
+    scrollLeft = container.scrollLeft;
+    container.style.cursor = 'grabbing';
+  });
+
+  container.addEventListener('mouseup', () => {
+    isMouseDown = false;
+    container.style.cursor = 'grab';
+  });
+
+  container.addEventListener('mouseleave', () => {
+    isMouseDown = false;
+    container.style.cursor = 'grab';
+  });
+
+  container.addEventListener('mousemove', (e) => {
+    if (!isMouseDown) return;
+    e.preventDefault();
+    const x = e.pageX - container.offsetLeft;
+    const walk = (x - startX) * 2;
+    container.scrollLeft = scrollLeft - walk;
+  });
+
+  container.addEventListener('touchstart', (e) => {
+    isMouseDown = true;
+    startX = e.touches[0].clientX - container.offsetLeft;
+    scrollLeft = container.scrollLeft;
+  });
+
+  container.addEventListener('touchend', () => {
+    isMouseDown = false;
+  });
+
+  container.addEventListener('touchmove', (e) => {
+    if (!isMouseDown) return;
+    const x = e.touches[0].clientX - container.offsetLeft;
+    const walk = (x - startX) * 2;
+    container.scrollLeft = scrollLeft - walk;
+  });
+
+  // Autoplay looping
+  let autoplayInterval;
+  const speed = 2; // Adjust scrolling speed
+
+  function startAutoplay() {
+    autoplayInterval = setInterval(() => {
+      container.scrollLeft += speed;
+      if (container.scrollLeft >= container.scrollWidth - container.offsetWidth) {
+        container.scrollLeft = 0;
+      }
+    }, 20); // Adjust autoplay interval as needed
+  }
+
+  function stopAutoplay() {
+    clearInterval(autoplayInterval);
+  }
+
+  startAutoplay();
+
+  container.addEventListener('mouseenter', stopAutoplay);
+  container.addEventListener('mouseleave', startAutoplay);
+
+  // Clone elements for infinite scrolling effect
+  const containerWidth = container.offsetWidth;
+  let cloneCount = Math.ceil(containerWidth / imageWidth);
+  
+  for (let i = 0; i < cloneCount; i++) {
+    images.forEach(image => {
+      const clone = image.cloneNode(true);
+      container.appendChild(clone);
+    });
+  }
+</script>
+
+</body>
+</html>
+
